@@ -1,0 +1,40 @@
+version: 0.2
+
+env:
+  variables:
+    NODE_ENV: "production"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing dependencies..."
+      - npm install
+
+  pre_build:
+    commands:
+      - echo "Running tests"
+      - npm test
+
+  build:
+    commands:
+      - echo "Build started on $(date)"
+      - echo "Nothing to compile for Node.js"
+
+  post_build:
+    commands:
+      - echo "Build complete on $(date)"
+
+artifacts:
+  files:
+    - app.js
+    - package.json
+    - package-lock.json
+    - appspec.yml
+    - scripts/**/*
+  discard-paths: no
+
+cache:
+  paths:
+    - node_modules/**/*
