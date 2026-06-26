@@ -1,5 +1,5 @@
 #!/bin/bash
 cd /home/ec2-user/my-api
-echo "Installing node modules..."
-npm install --production
-echo "Dependencies installed"
+echo "Starting app..."
+nohup node app.js > /dev/null 2>&1 &
+echo "App started"

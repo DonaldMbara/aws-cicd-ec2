@@ -1,4 +1,5 @@
 #!/bin/bash
-echo "Stopping app..."
-pkill -f "node app.js" || true   # || true so it doesn't fail if app isn't running
-echo "App stopped"
+cd /home/ec2-user/my-api
+echo "Installing node modules..."
+npm install --production
+echo "Dependencies installed"
