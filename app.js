@@ -3,7 +3,7 @@ const app = express();
 const PORT = 3000;
 
 app.get('/health', (req, res) => {
-  res.status(500).json({ status: 'error' });
+  res.json({ status: 'ok', version: '1.0' });
 });
 
 app.listen(PORT, () => {
