@@ -66,6 +66,9 @@ node app.js
 | Mixed up script contents | Double-check each script does what its filename says |
 | Deployment fails with generic error | Check specific lifecycle event in console, then view logs on instance |
 | `file_extists_behavior` typo | Correct spelling: `file_exists_behavior` |
+| Can't access app from browser on port 3000 | Security Group must allow inbound TCP on port 3000 |
+| Using `https://` for plain Express app | Use `http://` unless you configured SSL/TLS |
+| Test from EC2 itself with `curl localhost:3000/health`, or run app on port 80 |
 
 ### IAM Roles
 
@@ -96,6 +99,22 @@ cat /opt/codedeploy-agent/deployment-root/deployment-logs/codedeploy-agent-deplo
 - Example: `Environment = Production`
 - Instance must have that exact tag for CodeDeploy to target it
 
+### Networking & Access
+
+- Express app runs plain HTTP (not HTTPS) unless you configure SSL
+- Security Group must allow inbound TCP on your app's port (3000)
+- Corporate firewalls may block non-standard ports. Options:
+  - Test from EC2 itself: `curl http://localhost:3000/health`
+  - Run app on port 80 (requires root or `CAP_NET_BIND_SERVICE`)
+  - Put nginx reverse proxy in front on port 80/443
+
+### Rollback Behavior
+
+- **Auto-rollback disabled**: deployment fails, broken code stays, you manually redeploy previous revision
+- **Auto-rollback enabled**: CodeDeploy automatically redeploys last good revision on failure
+- A rollback is a **new full deployment** of the old revision (goes through entire lifecycle again)
+- Can configure rollback triggers: deployment failure, CloudWatch alarm threshold
+
 ### Key Exam Takeaways
 
 - `buildspec.yml` = CodeBuild (compile/package)
@@ -103,4 +122,9 @@ cat /opt/codedeploy-agent/deployment-root/deployment-logs/codedeploy-agent-deplo
 - The generic "too many instances failed" error means check the specific lifecycle event
 - Lifecycle event order matters. If AfterInstall fails, ApplicationStart never runs
 - Scripts run as the user specified in `runas` (typically `root`)
+- Rollback without auto-rollback enabled: broken code **stays on the instance**, deployment is marked Failed, nothing reverts automatically
+- Rollback with auto-rollback enabled: CodeDeploy redeploys the last known good revision automatically
+- A "rollback" in CodeDeploy is actually a **new deployment** of the previous revision (full lifecycle runs again)
+- Security Groups control network access. Non-standard ports (like 3000) must be explicitly opened
+- EC2 instance tags are how CodeDeploy identifies which instances to deploy to
 
